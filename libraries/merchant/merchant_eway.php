@@ -3,7 +3,7 @@
 /*
  * CI-Merchant Library
  *
- * Copyright (c) 2011 Crescendo Multimedia Ltd
+ * Copyright (c) 2011-2012 Crescendo Multimedia Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,36 +30,34 @@
  * Payment processing using eWAY
  */
 
-class Merchant_eway extends CI_Driver {
-
-	public $name = 'eWAY Hosted';
-
+class Merchant_eway extends Merchant_driver
+{
 	const PROCESS_URL = 'https://www.eway.com.au/gateway_cvn/xmlpayment.asp';
 	const PROCESS_URL_TEST =  'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp';
 
-	public $required_fields = array('amount', 'card_no', 'card_name', 'exp_month', 'exp_year', 'csc', 'currency_code', 'transaction_id', 'reference');
+	public $required_fields = array('amount', 'card_no', 'card_name', 'exp_month', 'exp_year', 'csc', 'currency_code', 'reference');
 
 	public $settings = array(
 		'customer_id' => '',
 		'test_mode' => FALSE
 	);
 
-	public function _process($params)
+	public function process($params)
 	{
 		// eway thows HTML formatted error if customerid is missing
 		if (empty($this->settings['customer_id'])) return new Merchant_response('failed', 'Missing Customer ID!');
 
 		$request = '<ewaygateway>'.
 	      		'<ewayCustomerID>'.$this->settings['customer_id'].'</ewayCustomerID>'.
-	      		'<ewayTotalAmount>'.sprintf('%01d', $params['amount'] * 100).'</ewayTotalAmount>'.
-	      		'<ewayCustomerInvoiceDescription>'.$params['reference'].'</ewayCustomerInvoiceDescription>'.
-	      		'<ewayCustomerInvoiceRef>'.$params['transaction_id'].'</ewayCustomerInvoiceRef>'.
+	      		'<ewayTotalAmount>'.round($params['amount'] * 100).'</ewayTotalAmount>'.
+	      		'<ewayCustomerInvoiceDescription></ewayCustomerInvoiceDescription>'.
+	      		'<ewayCustomerInvoiceRef>'.$params['reference'].'</ewayCustomerInvoiceRef>'.
 	      		'<ewayCardHoldersName>'.$params['card_name'].'</ewayCardHoldersName>'.
 	      		'<ewayCardNumber>'.$params['card_no'].'</ewayCardNumber>'.
 	      		'<ewayCardExpiryMonth>'.$params['exp_month'].'</ewayCardExpiryMonth>'.
 	      		'<ewayCardExpiryYear>'.($params['exp_year'] % 100).'</ewayCardExpiryYear>'.
-	      		'<ewayTrxnNumber>'.$params['transaction_id'].'</ewayTrxnNumber>'.
 	      		'<ewayCVN>'.$params['csc'].'</ewayCVN>'.
+	      		'<ewayTrxnNumber></ewayTrxnNumber>'.
 				'<ewayCustomerFirstName></ewayCustomerFirstName>'.
 				'<ewayCustomerLastName></ewayCustomerLastName>'.
 				'<ewayCustomerEmail></ewayCustomerEmail>'.

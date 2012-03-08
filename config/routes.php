@@ -17,3 +17,4 @@ $route['store/admin/attributes/categories(/:any)?']		= 'admin_attributes_categor
 $route['store/admin/attributes(/:any)?']				= 'admin_attributes$1';
 $route['store/admin/tags(/:any)?']						= 'admin_tags$1';
 $route['store/admin/category(/:any)?']					= 'admin_products/category_products$1';
+$route['store/admin/payment_gateways(/:any)?']			= 'admin_payment_gateways$1';

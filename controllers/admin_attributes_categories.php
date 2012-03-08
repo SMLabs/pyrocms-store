@@ -21,13 +21,14 @@ class Admin_attributes_categories extends Admin_Controller
 		$this->load->model('products_m');
 		$this->load->model('images_m');
 		$this->load->library('form_validation');
-		$this->load->library('store_settings');
-		$this->load->helper('date');
+		//$this->load->library('store_settings');  //AUTO LOADED
+		//$this->load->helper('date');   //AUTO LOADED
+
+		//$this->load->language('general');   //AUTO LOADED
+		//$this->load->language('settings');  //AUTO LOADED
 		
-		$this->load->language('general');
 		$this->load->language('dashboard');
 		$this->load->language('statistics');
-		$this->load->language('settings');
 		$this->load->language('categories');
 		$this->load->language('products');
 		$this->load->language('orders');

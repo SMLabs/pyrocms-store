@@ -3,7 +3,7 @@
 /*
  * CI-Merchant Library
  *
- * Copyright (c) 2011 Crescendo Multimedia Ltd
+ * Copyright (c) 2011-2012 Crescendo Multimedia Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,11 +30,9 @@
  * Payment processing using DPS PaymentExpress PxPay (hosted)
  */
 
-class Merchant_dps_pxpay extends CI_Driver {
-
+class Merchant_dps_pxpay extends Merchant_driver
+{
 	const PROCESS_URL = 'https://sec.paymentexpress.com/pxpay/pxaccess.aspx';
-
-	public $name = 'DPS PaymentExpress PxPay';
 
 	public $required_fields = array('email', 'amount', 'reference', 'currency_code', 'return_url', 'cancel_url');
 
@@ -51,7 +49,7 @@ class Merchant_dps_pxpay extends CI_Driver {
 		$this->CI =& get_instance();
 	}
 
-	public function _process($params)
+	public function process($params)
 	{
 		$this->CI->load->helper('url');
 
@@ -89,7 +87,7 @@ class Merchant_dps_pxpay extends CI_Driver {
 		}
 	}
 
-	public function _process_return()
+	public function process_return($params)
 	{
 		if ($this->CI->input->get('result', TRUE) === FALSE) return new Merchant_response('failed', 'invalid_response');
 

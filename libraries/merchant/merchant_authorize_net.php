@@ -3,7 +3,7 @@
 /*
  * CI-Merchant Library
  *
- * Copyright (c) 2011 Crescendo Multimedia Ltd
+ * Copyright (c) 2011-2012 Crescendo Multimedia Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,8 @@
  * Payment processing using Authorize.net AIM
  */
 
-class Merchant_authorize_net extends CI_Driver {
-
-	public $name = 'Authorize.Net AIM';
-
+class Merchant_authorize_net extends Merchant_driver
+{
 	public $settings = array(
 		'api_login_id' => '',
 		'transaction_key' => '',
@@ -50,7 +48,7 @@ class Merchant_authorize_net extends CI_Driver {
 		require_once MERCHANT_VENDOR_PATH.'/AuthorizeNet/AuthorizeNet.php';
 	}
 
-	public function _process($params)
+	public function process($params)
 	{
 		$transaction = new AuthorizeNetAIM($this->settings['api_login_id'],$this->settings['transaction_key']);
 		$transaction->amount = $params['amount'];

@@ -3,7 +3,7 @@
 /*
  * CI-Merchant Library
  *
- * Copyright (c) 2011 Crescendo Multimedia Ltd
+ * Copyright (c) 2011-2012 Crescendo Multimedia Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,8 @@
  * Payment processing using 2Checkout
  */
 
-class Merchant_2checkout extends CI_Driver {
-
-	public $name = '2Checkout';
-
+class Merchant_2checkout extends Merchant_driver
+{
 	public $required_fields = array('amount', 'reference', 'currency_code', 'return_url');
 
 	public $settings = array(
@@ -46,16 +44,12 @@ class Merchant_2checkout extends CI_Driver {
 
 	public $CI;
 
-	public function __construct($settings = array())
+	public function __construct()
 	{
-		foreach ($settings as $key => $value)
-		{
-			if(array_key_exists($key, $this->settings))	$this->settings[$key] = $value;
-		}
 		$this->CI =& get_instance();
 	}
 
-	public function _process($params)
+	public function process($params)
 	{
 		// post data to 2checkout
 		$data = array(
@@ -63,8 +57,9 @@ class Merchant_2checkout extends CI_Driver {
 			'cart_order_id' => $params['reference'],
 			'total' => $params['amount'],
 			'tco_currency' => $params['currency_code'],
+			'fixed' => 'Y',
 			'skip_landing' => 1,
-      		'x_Receipt_Link_URL' => $params['return_url'],
+			'x_receipt_link_url' => $params['return_url'],
 		);
 
 		foreach (array(
@@ -92,7 +87,7 @@ class Merchant_2checkout extends CI_Driver {
 		Merchant::redirect_post(self::PROCESS_URL, $data);
 	}
 
-	public function _process_return()
+	public function process_return($params)
 	{
 		$order_number = $this->CI->input->post('order_number');
 		$order_total = $this->CI->input->post('total');

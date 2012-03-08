@@ -22,13 +22,14 @@ class Admin_orders extends Admin_Controller
 		$this->load->model('orders_m');
 		$this->load->model('images_m');
 		$this->load->library('form_validation');
-		$this->load->library('store_settings');
-		$this->load->helper('date');
+		//$this->load->library('store_settings');  //AUTO LOADED
+		//$this->load->helper('date');   //AUTO LOADED
 		
-		$this->load->language('general');
+		//$this->load->language('general');   //AUTO LOADED
+		//$this->load->language('settings');  //AUTO LOADED
+
 		$this->load->language('dashboard');
 		$this->load->language('statistics');
-		$this->load->language('settings');
 		$this->load->language('categories');
 		$this->load->language('products');
 		$this->load->language('orders');
@@ -37,6 +38,8 @@ class Admin_orders extends Admin_Controller
 		$this->load->language('attributes');
 		$this->load->language('attributes_categories');
 		$this->load->language('status');
+		$this->load->language('payment_gateways');
+
 
 
 		if(is_dir($this->upload_path) OR @mkdir($this->upload_path,0777,TRUE)):

@@ -3,7 +3,7 @@
 /*
  * CI-Merchant Library
  *
- * Copyright (c) 2011 Crescendo Multimedia Ltd
+ * Copyright (c) 2011-2012 Crescendo Multimedia Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,13 +30,11 @@
  * Payment processing using DPS PaymentExpress PxPost
  */
 
-class Merchant_dps_pxpost extends CI_Driver {
-
+class Merchant_dps_pxpost extends Merchant_driver
+{
 	const PROCESS_URL = 'https://sec.paymentexpress.com/pxpost.aspx';
 
-	public $name = 'DPS PaymentExpress PxPost';
-
-	public $required_fields = array('amount', 'card_no', 'card_name', 'exp_month', 'exp_year', 'csc', 'currency_code', 'transaction_id', 'reference');
+	public $required_fields = array('amount', 'card_no', 'card_name', 'exp_month', 'exp_year', 'csc', 'currency_code', 'reference');
 
 	public $settings = array(
 		'username' => '',
@@ -44,7 +42,7 @@ class Merchant_dps_pxpost extends CI_Driver {
 		'enable_token_billing' => FALSE,
 	);
 
-	public function _process($params)
+	public function process($params)
 	{
 		$date_expiry = $params['exp_month'];
 		$date_expiry .= $params['exp_year'] % 100;
@@ -59,7 +57,6 @@ class Merchant_dps_pxpost extends CI_Driver {
 				'<Cvc2>'.$params['csc'].'</Cvc2>'.
 				'<InputCurrency>'.$params['currency_code'].'</InputCurrency>'.
 				'<TxnType>Purchase</TxnType>'.
-				'<TxnId>'.$params['transaction_id'].'</TxnId>'.
 				'<MerchantReference>'.$params['reference'].'</MerchantReference>'.
 				'<EnableAddBillCard>'.(int)$this->settings['enable_token_billing'].'</EnableAddBillCard>'.
 			'</Txn>';

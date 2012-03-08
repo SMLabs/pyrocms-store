@@ -18,12 +18,13 @@ class Admin_products extends Admin_Controller
 		parent::__construct();
 
 		$this->load->library('form_validation');
-		$this->load->library('store_settings');
+		//$this->load->library('store_settings');  //AUTO LOADED
+
+		//$this->load->language('general');   //AUTO LOADED
+		//$this->load->language('settings');  //AUTO LOADED
 		
-		$this->load->language('general');
 		$this->load->language('dashboard');
 		$this->load->language('statistics');
-		$this->load->language('settings');
 		$this->load->language('categories');
 		$this->load->language('products');
 		$this->load->language('orders');
@@ -31,6 +32,7 @@ class Admin_products extends Admin_Controller
 		$this->load->language('tags');
 		$this->load->language('attributes');
 		$this->load->language('attributes_categories');
+		$this->load->language('payment_gateways');
 
 		$this->load->model('categories_m');
 		$this->load->model('products_m');
@@ -38,7 +40,7 @@ class Admin_products extends Admin_Controller
 		$this->load->model('tags_m');
 		$this->load->model('attributes_m');
 
-		$this->load->helper('date');
+		//$this->load->helper('date');   //AUTO LOADED
 
 		if(is_dir($this->upload_path) OR @mkdir($this->upload_path,0777,TRUE)):
 

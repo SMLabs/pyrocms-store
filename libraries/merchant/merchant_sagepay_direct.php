@@ -3,7 +3,7 @@
 /*
  * CI-Merchant Library
  *
- * Copyright (c) 2011 Crescendo Multimedia Ltd
+ * Copyright (c) 2011-2012 Crescendo Multimedia Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,31 +30,38 @@
  * Payment processing using SagePay Direct
  */
 
-class Merchant_sagepay_direct extends CI_Driver {
-
-	public $name = 'SagePay Direct';
-
+class Merchant_sagepay_direct extends Merchant_driver
+{
 	const PROCESS_URL = 'https://live.sagepay.com/gateway/service/vspdirect-register.vsp';
 	const PROCESS_URL_TEST = 'https://test.sagepay.com/gateway/service/vspdirect-register.vsp';
-
-	// the simulator URL is only used for plugin development
 	const PROCESS_URL_SIM = 'https://test.sagepay.com/Simulator/VSPDirectGateway.asp';
 
+	const AUTH_URL = 'https://live.sagepay.com/gateway/service/direct3dcallback.vsp';
+	const AUTH_URL_TEST = 'https://test.sagepay.com/gateway/service/direct3dcallback.vsp';
+	const AUTH_URL_SIM = 'https://test.sagepay.com/Simulator/VSPDirectCallback.asp';
+
 	public $required_fields = array('amount', 'card_no', 'card_name', 'card_type',
-		'exp_month', 'exp_year', 'csc', 'currency_code', 'transaction_id', 'reference');
+		'exp_month', 'exp_year', 'csc', 'currency_code', 'reference');
 
 	public $settings = array(
 		'vendor' => '',
 		'test_mode' => FALSE
 	);
 
-	public function _process($params)
+	public $CI;
+
+	public function __construct()
+	{
+		$this->CI =& get_instance();
+	}
+
+	public function process($params)
 	{
 		$data = array(
 			'VPSProtocol' => '2.23',
 			'TxType' => 'PAYMENT',
 			'Vendor' => $this->settings['vendor'],
-			'VendorTxCode' => $params['transaction_id'],
+			'VendorTxCode' => $params['reference'],
 			'Description' => $params['reference'],
 			'Amount' => sprintf('%01.2f', $params['amount']),
 			'Currency' => $params['currency_code'],
@@ -63,13 +70,17 @@ class Merchant_sagepay_direct extends CI_Driver {
 			'CV2' => $params['csc'],
 			'CardType' => strtoupper($params['card_type']),
 			'ExpiryDate' => $params['exp_month'].($params['exp_year'] % 100),
-			'AccountType' => 'E',
-			'ApplyAVSCV2' => 2,
+			'ClientIPAddress' => $this->CI->input->ip_address(),
+			'ApplyAVSCV2' => 0,
+			'Apply3DSecure' => 0,
 		);
 
 		if ($data['CardType'] == 'MASTERCARD') $data['CardType'] = 'MC';
 
-		if ( ! empty($params['card_issue'])) $data['IssueNumber'] = $params['card_issue'];
+		if ( ! empty($params['card_issue']))
+		{
+			$data['IssueNumber'] = $params['card_issue'];
+		}
 		if ( ! empty($params['start_month']) AND ! empty($params['start_year']))
 		{
 			$data['StartDate'] = $params['start_month'].($params['start_year'] % 100);
@@ -78,27 +89,79 @@ class Merchant_sagepay_direct extends CI_Driver {
 		$response = Merchant::curl_helper($this->settings['test_mode'] ? self::PROCESS_URL_TEST : self::PROCESS_URL, $data);
 		if ( ! empty($response['error'])) return new Merchant_response('failed', $response['error']);
 
-		// convert weird ini-type format to a useful array
-		$response_array = explode("\n", $response['data']);
-		foreach ($response_array as $key => $value)
-		{
-			unset($response_array[$key]);
-			$line = explode('=', $value, 2);
-			$response_array[trim($line[0])] = isset($line[1]) ? trim($line[1]) : '';
-		}
+		return $this->_process_response($response['data'], $params);
+	}
 
-		if (empty($response_array['Status']))
+	/**
+	 * Only used for returning from 3D Secure Authentication
+	 */
+	public function process_return($params)
+	{
+		$data = array(
+			'MD' => $this->CI->input->post('MD'),
+			'PARes' => $this->CI->input->post('PaRes'),
+		);
+
+		if (empty($data['MD']) OR empty($data['PARes']))
 		{
 			return new Merchant_response('failed', 'invalid_response');
 		}
-		elseif ($response_array['Status'] == 'OK')
+
+		$response = Merchant::curl_helper($this->settings['test_mode'] ? self::AUTH_URL_TEST : self::AUTH_URL, $data);
+		if ( ! empty($response['error'])) return new Merchant_response('failed', $response['error']);
+
+		return $this->_process_response($response['data'], $params);
+	}
+
+	protected function _process_response($response, $params)
+	{
+		$response = $this->_decode_response($response);
+
+		if (empty($response['Status']))
 		{
-			return new Merchant_response('authorized', $response_array['StatusDetail'], $response_array['VPSTxId'], (double)$params['amount']);
+			return new Merchant_response('failed', 'invalid_response');
 		}
-		else
+
+		$txn_id = empty($response['VPSTxId']) ? NULL : $response['VPSTxId'];
+		$message = empty($response['StatusDetail']) ? NULL : $response['StatusDetail'];
+
+		if ($response['Status'] == 'OK')
 		{
-			return new Merchant_response('declined', $response_array['StatusDetail']);
+			return new Merchant_response('authorized', $message, $txn_id, (double)$params['amount']);
 		}
+
+		if ($response['Status'] == '3DAUTH')
+		{
+			// redirect to card issuer for 3D Authentication
+			$data = array(
+				'PaReq' => $response['PAReq'],
+				'TermUrl' => $params['return_url'],
+				'MD' => $response['MD'],
+			);
+			Merchant::redirect_post($response['ACSURL'], $data, 'Please wait while we redirect you to your card issuer for authentication...');
+		}
+
+		return new Merchant_response('declined', $message, $txn_id);
+	}
+
+	/**
+	 * Convert weird ini-type format into a useful array
+	 */
+	protected function _decode_response($response)
+	{
+		$lines = explode("\n", $response);
+		$data = array();
+
+		foreach ($lines as $line)
+		{
+			$line = explode('=', $line, 2);
+			if ( ! empty($line[0]))
+			{
+				$data[trim($line[0])] = isset($line[1]) ? trim($line[1]) : '';
+			}
+		}
+
+		return $data;
 	}
 }
 

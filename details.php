@@ -160,6 +160,17 @@ class Module_Store extends Module {
 						   'class'	=> 'list'
 						)
 					)
+				),
+				'payment_gateways' => array(
+				    'name'		=> 'store:payment_gateways:menu',
+				    'uri'		=> 'admin/store/payment_gateways',
+				    'shortcuts'	=> array(
+						array(
+					 	   'name'	=> 'store:payment_gateways:shortcut:list',
+						   'uri'	=> 'admin/store/payment_gateways',
+						   'class'	=> 'list'
+						)
+					)
 				)
 			)
 		);

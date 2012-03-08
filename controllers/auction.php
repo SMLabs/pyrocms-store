@@ -14,18 +14,19 @@ class auction extends Public_Controller
     parent::__construct();
 
     $this->load->library('cart');
-    $this->load->library('store_settings');
+   //$this->load->library('store_settings');  //AUTO LOADED
 
-    $this->load->language('general');
+		//$this->load->language('general');   //AUTO LOADED
+		//$this->load->language('settings');  //AUTO LOADED
+
     $this->load->language('cart');
-    $this->load->language('settings');
     $this->load->language('auctions');
-
+	
     $this->load->model('store_m');
     $this->load->model('categories_m');
     $this->load->model('auctions_m');
 
-    $this->load->helper('date');
+    //$this->load->helper('date');   //AUTO LOADED
 		
     $this->template
       ->append_metadata(css('store.css', 'store'))

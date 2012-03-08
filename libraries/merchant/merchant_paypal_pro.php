@@ -3,7 +3,7 @@
 /*
  * CI-Merchant Library
  *
- * Copyright (c) 2011 Crescendo Multimedia Ltd
+ * Copyright (c) 2011-2012 Crescendo Multimedia Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,8 @@
  * Payment processing using Paypal Payments Pro
  */
 
-class Merchant_paypal_pro extends CI_Driver {
-
-	public $name = 'PayPal Pro';
-
+class Merchant_paypal_pro extends Merchant_driver
+{
 	public $required_fields = array('reference', 'currency_code', 'amount',
 		'card_no', 'card_name', 'exp_month', 'exp_year', 'csc');
 
@@ -49,17 +47,12 @@ class Merchant_paypal_pro extends CI_Driver {
 
 	public $CI;
 
-	public function __construct($settings = array())
+	public function __construct()
 	{
 		$this->CI =& get_instance();
-
-		foreach ($settings as $key => $value)
-		{
-			if (array_key_exists($key, $this->settings)) $this->settings[$key] = $value;
-		}
 	}
 
-	public function _process($params)
+	public function process($params)
 	{
 		$card_name = explode(' ', $params['card_name'], 2);
 
