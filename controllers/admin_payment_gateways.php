@@ -17,9 +17,10 @@ class Admin_payment_gateways extends Admin_Controller
 	{
 		parent::__construct();
 
-		$this->load->model('attributes_m');
-		$this->load->model('products_m');
-		$this->load->model('images_m');
+		///$this->load->model('attributes_m');
+		////$this->load->model('products_m');
+		//$this->load->model('images_m');
+		$this->load->model('gateway_settings_m');
 		$this->load->library('form_validation');
 		//$this->load->library('store_settings');  //AUTO LOADED
 		//$this->load->helper('date');   //AUTO LOADED
@@ -63,8 +64,10 @@ class Admin_payment_gateways extends Admin_Controller
 
 	public function index($ajax = FALSE)
 	{
+		$data["settings"] = $this->gateway_settings_m->get_settings();
+		///print_r($data["settings"]); exit;
 		$this->template
-			 ->build('admin/payment_gateways/settings');
+			 ->build('admin/payment_gateways/settings', $data);
 	}
 
 }
