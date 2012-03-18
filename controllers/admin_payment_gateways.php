@@ -52,7 +52,19 @@ class Admin_payment_gateways extends Admin_Controller
 				'rules' => 'trim|max_length[1000]|required'
 			)
 		);*/
-
+		$this->validation_rules = array(
+			array(
+				'field' => 'paypal_account',
+				'label' => lang('store:payment_gateways:label:paypal_account'),
+				'rules' => 'trim|max_length[255]|required'
+			),
+			array(
+				'field' => 'paypal_api_key',
+				'label' => lang('store:payment_gateways:label:paypal_api_key'),
+				'rules' => 'trim|max_length[255]|required'
+			)
+		);
+		
 		$this->template
 			 ->set_partial('shortcuts', 'admin/partials/shortcuts')
 			 ->append_metadata(js('admin.js', 'store'))
@@ -64,10 +76,26 @@ class Admin_payment_gateways extends Admin_Controller
 
 	public function index($ajax = FALSE)
 	{
-		$data["settings"] = $this->gateway_settings_m->get_settings();
-		///print_r($data["settings"]); exit;
-		$this->template
-			 ->build('admin/payment_gateways/settings', $data);
+		$this->form_validation->set_rules($this->validation_rules);
+
+		if(!$this->form_validation->run()):				
+		
+			$data["settings"] = $this->gateway_settings_m->get_settings();
+			$this->template
+				 ->build('admin/payment_gateways/settings', $data);
+		else:
+			///print_r($_POST); exit;
+			if ( !$this->gateway_settings_m->settings_manager_store() ):
+				$this->session->set_flashdata('success', sprintf(lang('store:payment_gateways:messages:success:edit'), $this->input->post('name')));
+				redirect('admin/store/payment_gateways');
+
+			else:
+
+				$this->session->set_flashdata(array('error'=> lang('store:payment_gateways:messages:error:edit')));
+		
+			endif;
+			
+		endif;
 	}
 
 }

@@ -31,7 +31,7 @@ class Gateway_settings_m extends MY_Model {
 	public function item($slug)
 	{
 		$this->db->where('slug',$slug);
-		$this->settings = $this->db->get('store_settings');
+		$this->settings = $this->db->get('store_gateway_settings');
 		foreach($this->settings->result() as $this->setting)
 		{
 			return $this->setting->value;
@@ -44,7 +44,7 @@ class Gateway_settings_m extends MY_Model {
 			'value' => $value
 		);
 		$this->db->where('slug',$slug);
-		$this->db->update('store_settings',$this->setting_data);
+		$this->db->update('store_gateway_settings',$this->setting_data);
 		
 	}
 	
@@ -56,21 +56,39 @@ class Gateway_settings_m extends MY_Model {
 	
 	public function settings_manager_store()
 	{
+		//print_r($this->input->post()); exit;
 		foreach($this->input->post() as $this->post_key => $this->post_value )
 		{
 			$this->db->where('slug',$this->post_key);
-			$this->settings = $this->db->get('store_settings');
+			$this->settings = $this->db->get('store_gateway_settings');
 			if($this->settings->num_rows()!=NULL)
 			{
-				$this->set_item($this->post_key,$this->post_value);
+				if( $this->post_value == '0')
+					$this->set_item($this->post_key,1);
+				else
+					$this->set_item($this->post_key,$this->post_value);	
 			}
 		}
+		
+		if( $this->input->post("paypal_enabled") == "" )
+			$this->set_item("paypal_enabled",0);
+		
+		if( $this->input->post("paypal_developer_mode") == "" )
+			$this->set_item("paypal_developer_mode",0);
+
+		if( $this->input->post("paypal_wpp_enabled") == "" )
+			$this->set_item("paypal_wpp_enabled",0);
+
+		if( $this->input->post("paypal_wwp_developer_mode") == "" )
+			$this->set_item("paypal_wwp_developer_mode",0);
+	
+	
 	}
 	
 	public function generate_dropdown($slug)
 	{
 		$this->db->where('slug',$slug);
-		$this->items = $this->db->get('store_settings');
+		$this->items = $this->db->get('store_gateway_settings');
 		$this->dropdown = array('Select' => 'Select');
 		foreach($this->items->result() as $this->item)
 		{

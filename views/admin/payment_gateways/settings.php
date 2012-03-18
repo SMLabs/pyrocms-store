@@ -83,7 +83,7 @@ echo form_open(uri_string(), 'class="crud"'); ?>
                      
                 <li class="<?php echo alternator('even', ''); ?>">
                     <?php echo lang('store:payment_gateways:label:'.$this->setting->slug,$this->setting->slug); ?> 
-                    <?php if($this->setting->value == 1) { echo form_checkbox($this->setting->slug,'1',TRUE); } else { echo form_checkbox($this->setting->slug,'0',TRUE); } ?>				
+                    <?php if($this->setting->value == 1) { echo form_checkbox($this->setting->slug,'1',TRUE); } else { echo form_checkbox($this->setting->slug,'0',FALSE); } ?>				
                     </li><?php if($this->setting->slug == "paypal_developer_mode" || $this->setting->slug == "paypal_wwp_developer_mode" ) { echo "<hr />"; } ?>
 				</li>
 			<?php break; case 'textarea': ?>
