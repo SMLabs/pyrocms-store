@@ -1,36 +1,35 @@
-#pyrocms-store
+CI Merchant Library
+===================
 
-WARNING - THIS IS STILL A DEVELOPMENT VERSION AND NOT CURRENTLY WORKING.
+Requirements
+------------
+ * CodeIgniter 2.0+
 
-##Description
+Quick Start
+-----------
 
-Welcome this is a Store or Webshop for pyrocms.
-its currrently in development and we hope to have a working version near the beginning or end of december.
-if you have any questions don't hesitate to ask them.
+	// load the merchant library
+	$this->load->library('merchant');
 
-greetings the pyrocms-store team
+	// load a payment driver
+	$this->merchant->load('paypal');
 
-## Website
+	// initialize payment driver settings (if not already done in config)
+	$this->merchant->initialize(array(
+		'paypal_email' => 'text@example.com'
+	));
 
-* [website](http://www.odin-addons.com/)
-* [forums](http://www.odin-addons.com/forums)
+	// process payment
+	$this->merchant->purchase(array(
+		'amount' => 99.00,
+		'currency' => 'USD',
+		'reference' => 'Order #50'
+	));
 
-##The Team
+	// process return from payment gateway (hosted payment gateways only)
+	$this->merchant->purchase_return();
 
-* [Jaap Jolman](https://github.com/jaapjolman)
-* [Kevin Meier](https://github.com/Meissullo)
-* [Rudolph Arthur Hernandez](https://github.com/rudolphh)
-* [Gary Hussey](https://github.com/bossninja)
+License
+-------
 
-##Installing
-
-Just unzip the folder in the pyrocms/addons folder or use the upload function as always.
-
-##Uninstalling
-
-use the uninstall button in the addons manager.
-
-##Changelog
-
-26-11-2011
-Added more info on the project
+You are free to use this code under the terms of the MIT License. See LICENSE.txt for further details.
