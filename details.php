@@ -204,24 +204,36 @@ class Module_Store extends Module {
 		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'allow_comments', 'radio', '', '', 'general', '1', '1', '8');");
 		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'new_order_mail_alert', 'radio', '', '', 'general', '1', '1', '9');");
 		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'active', 'radio', '', '', 'general', '1', '1', '10');");
-		
-	/** Need to trim /delete from store settings
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_enabled', 'checkbox', '0', '', 'payment-gateways', '1', '1', '12');");
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_account', 'text', '', '', 'payment-gateways', '1', '1', '13');");
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_developer_mode', 'checkbox', '1', '', 'payment-gateways', '1', '1', '14');");
-		
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'authorize_enabled', 'radio', '0', '', 'payment-gateways', '1', '1', '15');");
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'authorize_account', 'text', '', '', 'payment-gateways', '1', '1', '16');");
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'authorize_secret', 'text', '', '', 'payment-gateways', '1', '1', '17');");
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'authorize_developer_mode', 'radio', '1', '', 'payment-gateways', '1', '1', '18');");
-	**/
-		
 		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'terms_and_conditions', 'wysiwyg|simple', '', '', 'extra', '1', '1', '11');");
 		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'privacy_policy', 'textarea', '', '', 'extra', '1', '1', '12');");
 		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `tab`, `is_required`, `gui`, `order`) VALUES (null, 'delivery_information', 'textarea', '', '', 'extra', '1', '1', '13');");
 
 
 /**
+@ Table Name: store_gateways
+@ Added By: Nauman
+@ Purpose:  Store Gayways
+**/
+		$this->db->query("
+			CREATE  TABLE IF NOT EXISTS `" . $this->db->dbprefix('store_gateways') . "` (
+				`gateway_id` INT NOT NULL AUTO_INCREMENT ,
+				`title` VARCHAR(255) NOT NULL ,
+				`is_active` ENUM('1','0') NOT NULL ,
+				`developer_mode` ENUM('1','0') NOT NULL ,
+				`order` INT NOT NULL ,
+				PRIMARY KEY (`gateway_id`) )
+			ENGINE = InnoDB;");
+		
+		/** @@@ Standard Default Setting ***/ 
+		
+		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateways') . "` (`title`, `developer_mode`, `is_active`, `order`) VALUES ('paypal', '1', '1','1');");
+		
+		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateways') . "` (`title`, `developer_mode`, `is_active`, `order`) VALUES ('paypal_wpp', '1', '1','2');");
+		
+		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateways') . "` (`title`, `developer_mode`, `is_active`, `order`) VALUES ('authorizenet', '1', '0','3');");
+
+/**
+@@@--------------------------------------------------Gateway Tables-: ... START ---------------------------------------------------------------------@@@
 @ Table Name: store_gateway_settings
 @ Added By: Nauman
 @ Purpose:  Store Gayways Setting
@@ -229,43 +241,27 @@ class Module_Store extends Module {
 		$this->db->query("
 			CREATE  TABLE IF NOT EXISTS `" . $this->db->dbprefix('store_gateway_settings') . "` (
 				`settings_id` INT NOT NULL AUTO_INCREMENT ,
+				`gateway_id` INT NOT NULL ,
 				`slug` VARCHAR(255) NOT NULL ,
-				`type` VARCHAR(255) NOT NULL ,
 				`value` TEXT NOT NULL ,
-				`options` VARCHAR(255) NOT NULL ,
-				`is_required` ENUM('1','0') NOT NULL ,
-				`gui` ENUM('1','0') NOT NULL ,
-				`order` INT NOT NULL ,
 				PRIMARY KEY (`settings_id`) )
 			ENGINE = InnoDB;");
 		
-		/** @@@ PayPal Standard Default Setting ***/ 
+		/** @@@ INSERT PayPal Default Setting ***/ 
+		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`gateway_id`, `slug`, `value`) VALUES (1, 'paypal_account', '');");
 		
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_enabled', 'checkbox', '0', '', '1', '1', '12');");
+		/** @@@ INSERT Website Payments Pro Default Setting ***/ 
+		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`gateway_id`, `slug`, `value`) VALUES (2, 'paypal_api_key', '');");
 		
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_account', 'text', '', '', '1', '1', '13');");
+		/** @@@ INSERT Authorize.net Default Setting ***/ 
+		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`gateway_id`, `slug`, `value`) VALUES (3, 'authorize_account', '');");
+		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`gateway_id`, `slug`, `value`) VALUES (3, 'authorize_secret', '');");
 		
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_developer_mode', 'checkbox', '1', '', '1', '1', '14');");
-
-		/** @@@ Website Payments Pro Default Setting ***/ 
-		
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_wpp_enabled', 'checkbox', '0', '', '1', '1', '12');");
-		
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_api_key', 'text', '', '', '1', '1', '13');");
-		
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'paypal_wwp_developer_mode', 'checkbox', '1', '', '1', '1', '14');");
-		
-		/** @@@ Authorize.net Settings ***/ 
-		/** @@@ Setting: OFF
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'authorize_enabled', 'checkbox', '0', '', '1', '1', '15');");
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'authorize_account', 'text', '', '', '1', '1', '16');");
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'authorize_secret', 'text', '', '', '1', '1', '17');");
-		$this->db->query("INSERT INTO `" . $this->db->dbprefix('store_gateway_settings') . "` (`settings_id`, `slug`, `type`, `value`, `options`, `is_required`, `gui`, `order`) VALUES (null, 'authorize_developer_mode', 'checkbox', '1', '', '1', '1', '18');");
-		**/
 
 /**
-@@@--------------------------------------------------Table: ... END ---------------------------------------------------------------------@@@
+@@@--------------------------------------------------Gateway Tables-: ... END ---------------------------------------------------------------------@@@
 **/
+
 		$this->db->query("
 			CREATE  TABLE IF NOT EXISTS `" . $this->db->dbprefix('store_currency') . "` (
 				`currency_id` INT NOT NULL AUTO_INCREMENT ,
@@ -472,6 +468,7 @@ class Module_Store extends Module {
 		$this->db->query("DELETE FROM `core_stores` WHERE store_id=(SELECT `value` FROM `" . $this->db->dbprefix('store_settings') . "` WHERE slug='store_id');");
 		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_settings') . "`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_gateway_settings') . "`;");
+		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_gateways') . "`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_currency') . "`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_status') . "`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_users_addresses') . "`;");
@@ -484,7 +481,7 @@ class Module_Store extends Module {
 		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_order_addresses') . "`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_orders_has_store_products') . "`;");
 		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_product_attributes') . "`;");
-		$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_products') . "`;");
+		///$this->db->query("DROP TABLE IF EXISTS `" . $this->db->dbprefix('store_products') . "`;");
 		$this->db->delete('settings', array('module' => 'store'));
 		{
 			return TRUE;
