@@ -40,19 +40,7 @@ class Admin_payment_gateways extends Admin_Controller
 		$this->load->language('payment_gateways');
 
 		
-		/*$this->item_validation_rules = array(
-			array(
-				'field' => 'name',
-				'label' => 'store:attributes:label:name',
-				'rules' => 'trim|max_length[255]|required'
-			),
-			array(
-				'field' => 'html',
-				'label' => 'store:attributes:label:html',
-				'rules' => 'trim|max_length[1000]|required'
-			)
-		);*/
-		$this->validation_rules = array(
+		/*$this->validation_rules = array(
 			array(
 				'field' => 'paypal_account',
 				'label' => lang('store:payment_gateways:label:paypal_account'),
@@ -63,7 +51,7 @@ class Admin_payment_gateways extends Admin_Controller
 				'label' => lang('store:payment_gateways:label:paypal_api_key'),
 				'rules' => 'trim|max_length[255]|required'
 			)
-		);
+		);*/
 		
 		$this->template
 			 ->set_partial('shortcuts', 'admin/partials/shortcuts')
@@ -76,16 +64,20 @@ class Admin_payment_gateways extends Admin_Controller
 
 	public function index($ajax = FALSE)
 	{
-		$this->form_validation->set_rules($this->validation_rules);
+		//$this->form_validation->set_rules($this->validation_rules);
 
-		if(!$this->form_validation->run()):				
+		//if(!$this->form_validation->run()):				
+		//if(empty($this->input->post())):				
 		
-			$data["settings"] = $this->gateway_settings_m->get_settings();
+			$data["paypal_settings"] = $this->gateway_settings_m->get_paypal_settings();
+			$data["paypal_wpp_settings"] = $this->gateway_settings_m->get_paypal_wpp_settings();
+			$data["authorizenet_settings"] = $this->gateway_settings_m->get_authorizenet_settings(); 
+			
 			$this->template
 				 ->build('admin/payment_gateways/settings', $data);
-		else:
+		///else:
 			///print_r($_POST); exit;
-			if ( !$this->gateway_settings_m->settings_manager_store() ):
+			/*if ( !$this->gateway_settings_m->settings_manager_store() ):
 				$this->session->set_flashdata('success', sprintf(lang('store:payment_gateways:messages:success:edit'), $this->input->post('name')));
 				redirect('admin/store/payment_gateways');
 
@@ -93,9 +85,22 @@ class Admin_payment_gateways extends Admin_Controller
 
 				$this->session->set_flashdata(array('error'=> lang('store:payment_gateways:messages:error:edit')));
 		
-			endif;
+			endif;*/
 			
-		endif;
+		///endif;
+	}
+	
+	public function save()
+	{
+		if ( !$this->gateway_settings_m->settings_manager_store() ):
+				$this->session->set_flashdata('success', sprintf(lang('store:payment_gateways:messages:success:edit'), $this->input->post('name')));
+				redirect('admin/store/payment_gateways');
+
+		else:
+
+			$this->session->set_flashdata(array('error'=> lang('store:payment_gateways:messages:error:edit')));
+		
+		endif;		
 	}
 
 }

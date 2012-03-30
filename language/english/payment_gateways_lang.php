@@ -36,13 +36,14 @@ $lang['store:payment_gateways:label:actions']					= 'Actions';
 $lang['store:payment_gateways:label:paypal_standard']			= 'Paypal Standard';
 $lang['store:payment_gateways:label:paypal_enabled']			= 'Paypal Enabled';
 $lang['store:payment_gateways:label:paypal_account']			= 'Paypal Account';
-$lang['store:payment_gateways:label:paypal_developer_mode']		= 'Developer mode';
+$lang['store:payment_gateways:label:paypal_developer_mode']		= 'Developer Mode';
 
-$lang['store:payment_gateways:label:website_payments_pro']			= 'For Website Payments Pro';
+$lang['store:payment_gateways:label:website_payments_pro']			= 'Paypal Website Payments Pro';
 $lang['store:payment_gateways:label:paypal_wpp_enabled']			= 'Paypal WPP Enabled';
 $lang['store:payment_gateways:label:paypal_api_key']			= 'API Key/Secret';
 $lang['store:payment_gateways:label:paypal_wwp_developer_mode']		= 'Developer mode';
 
+$lang['store:payment_gateways:label:authorizenet']		= 'Authorize.net';
 $lang['store:payment_gateways:label:authorize_enabled']			= 'Authorize.net Enabled';
 $lang['store:payment_gateways:label:authorize_account']			= 'Authorize.net Token';
 $lang['store:payment_gateways:label:authorize_secret']			= 'Authorize.net Secret';
